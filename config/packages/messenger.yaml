@@ -9,6 +9,7 @@ framework:
                 default_middleware: allow_no_handlers
                 middleware:
                     - App\Messenger\AuditMiddleware
+            query.bus: ~
 
         # Uncomment this (and the failed transport below) to send failed messages to this transport for later handling.
         failure_transport: failed
@@ -22,7 +23,10 @@ framework:
             async_priority_high:
                 dsn: "%env(MESSENGER_TRANSPORT_DSN)%"
                 options:
-                    queue_name: high
+                    exchange:
+                        name: messages_high_priority
+                    queues:
+                        messages_high: ~
             failed: "doctrine://default?queue_name=failed"
             # sync: 'sync://'
 
@@ -30,3 +34,4 @@ framework:
             # Route your messages to the transports
             'App\Message\Command\AddPonkaToImage': async_priority_high
             'App\Message\Event\ImagePostDeletedEvent': async
+            # 'App\Message\Command\DeleteImagePost': [async, async_priority_high]
